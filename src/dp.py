@@ -4,10 +4,9 @@ from itertools import product
 comp = 0
 
 #dp 알고리즘 구현
-
 def is_time_overlap(time1, time2):
   global comp
-  comp = comp + 2
+  comp += 1
   return max(time1[0], time2[0]) < min(time1[1], time2[1])
 
 #dict안에 넣어주기 위해 list을 tuple로 변환

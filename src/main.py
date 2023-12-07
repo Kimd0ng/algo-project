@@ -1,6 +1,7 @@
 import openpyxl
-from itertools import product
 import greedy
+import dp
+import brute
 
 class Time:
     def __init__(self, course_id, times):
@@ -74,27 +75,6 @@ def process_lecture_schedule(file_path):
 
     return lectures_dict, times_dict
 
-def is_time_overlap(time1, time2):
-    return max(time1[0], time2[0]) < min(time1[1], time2[1])
-
-def are_times_overlapping(times):
-    for i in range(len(times)):
-        for j in range(i+1, len(times)):
-            if is_time_overlap(times[i], times[j]):
-                return True
-    return False
-
-def find_schedule(desired_courses, times_dict):
-    possible_combinations = product(*(times_dict[course] for course in desired_courses))
-
-    feasible_schedules = []
-    for combination in possible_combinations:
-        times = [time for lecture_times in combination for time in lecture_times.times]
-
-        if not are_times_overlapping(times):
-            feasible_schedules.append([lecture.course_id for lecture in combination])
-
-    return feasible_schedules
 
 def print_schedule_details(schedule, lectures_dict):
     for full_course_id in schedule:
@@ -108,8 +88,12 @@ def print_schedule_details(schedule, lectures_dict):
 file_path = "data.xlsx"
 lectures_dict, times_dict = process_lecture_schedule(file_path)
 desired_courses = get_desired_courses()
-feasible_schedules = find_schedule(desired_courses, times_dict)
 
+feasible_schedules = brute.find_schedule_brute(desired_courses, times_dict)
+brute_comp = brute.comp
+
+print("Brute Force Algorithm")
+print("비교횟수: ",brute_comp)
 if not feasible_schedules:
     print("가능한 시간표가 없습니다.")
 else:
@@ -119,11 +103,13 @@ else:
         print_schedule_details(schedule, lectures_dict)
         print('')
         print("--------------------------------")
+print('')
 
-#그리디 알고리즘
 feasible_schedules= greedy.find_schedule_greedy(desired_courses, times_dict)
 greedy_comp = greedy.comp
 
+print("Greedy Algorithm")
+print("비교횟수: ",greedy_comp)
 if not feasible_schedules:
     print("가능한 시간표가 없습니다.")
 else:
@@ -133,3 +119,21 @@ else:
         print_schedule_details(schedule, lectures_dict)
         print('')
         print("--------------------------------")
+
+print('')
+
+feasible_schedules= dp.find_schedule_dp(desired_courses, times_dict)
+dp_comp = dp.comp
+
+print("DP Algorithm")
+print("비교횟수: ",dp_comp)
+if not feasible_schedules:
+    print("가능한 시간표가 없습니다.")
+else:
+    for schedule in feasible_schedules:
+        print("--------------------------------")
+        print('')
+        print_schedule_details(schedule, lectures_dict)
+        print('')
+        print("--------------------------------")
+print('')
